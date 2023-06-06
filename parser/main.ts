@@ -5,7 +5,7 @@ import * as chrome from "selenium-webdriver/chrome";
 
 const baseUrl = 'https://www.facebook.com/groups/504173917225379/';
 
-const parsePosts = async (url) => {
+const parsePosts = async (url: string) => {
   const chromeOptions = new chrome.Options()
     .windowSize({width: 1920, height: 1080})
     .addArguments('--headless');

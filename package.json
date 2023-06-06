@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-parser": "npx tsc & node ./parser/main.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/selenium-webdriver": "^4.1.15",
-    "selenium-webdriver": "^4.9.2"
+    "selenium-webdriver": "^4.9.2",
+    "telegraf": "^4.12.2"
   }
 }
