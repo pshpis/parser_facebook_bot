@@ -19,9 +19,17 @@ const parsePosts = async (url: string) => {
     await driver.get(url);
     await driver.sleep(3000);
     const script: string = `
-      const feed = document.querySelector('[role="feed"]');
-      const lastPost = feed.children[1];
-      lastPost.querySelector('[role="button"]').click();
+      window.scrollTo(0, 3000);
+      setTimeout(() => {
+        const feed = document.querySelector('[role="feed"]');
+        const posts = Array.from(feed.children).filter((x, i) => i > 0);
+        posts.forEach(post => {
+          const morebtn = post.querySelectorAll('[role="button"]')[1];
+          if (morebtn) morebtn.click();
+
+        });
+      }, 2000);
+      
     `;
     await driver.executeScript(script);
     await driver.sleep(3000);
