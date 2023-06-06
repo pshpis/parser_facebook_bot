@@ -6,7 +6,7 @@ const bot = new Telegraf(BOT_TOKEN)
 
 
 bot.command('publish', async (ctx) => {
-    const channelId = '@alex723_1563982_bot'; // Replace with your channel username or ID
+    const channelId = 't.me/vacansies_from_FB';
     const message = 'This is a publication sent by the bot admin.';
     
     try {
