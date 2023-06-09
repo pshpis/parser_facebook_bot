@@ -12,15 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const telegraf_1 = require("telegraf");
 const config_1 = require("./config");
 const bot = new telegraf_1.Telegraf(config_1.BOT_TOKEN);
-bot.command('publish', (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    const channelId = 't.me/vacansies_from_FB';
-    const message = 'This is a publication sent by the bot admin.';
-    try {
-        const publication = yield bot.telegram.sendMessage(channelId, message);
-        console.log('Publication sent successfully:', publication);
-    }
-    catch (error) {
-        console.error('Failed to send publication:', error);
-    }
-}));
+const channelId = '-1001679641945';
+const message = 'This is a publication sent by the bot admin.';
+function sendMessageToChannel(channelId, message) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield bot.telegram.sendMessage(channelId, message);
+            console.log('Message sent successfully');
+        }
+        catch (error) {
+            console.error('Error sending message:', error);
+        }
+    });
+}
+sendMessageToChannel(channelId, message);
 bot.launch();

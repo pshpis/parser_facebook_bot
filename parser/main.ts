@@ -84,8 +84,6 @@ const parsePosts = async (url: string) => {
     .setChromeOptions(chromeOptions)
     .build();
 
-  // await driver.manage().setTimeouts({script: 120000});
-
   try {
     await driver.get(url);
     await driver.sleep(3000);
