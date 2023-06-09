@@ -71,33 +71,52 @@ async function main() {
 main();
 `;
 
-
-const baseUrl: string = 'https://www.facebook.com/groups/504173917225379/';
-
-const parsePosts = async (url: string) => {
-  const chromeOptions = new chrome.Options()
-    .windowSize({width: 1920, height: 1080})
-    .addArguments('--headless');
-
-  const driver = new Builder()
-    .forBrowser('chrome')
-    .setChromeOptions(chromeOptions)
-    .build();
-
-  // await driver.manage().setTimeouts({script: 120000});
-
-  try {
-    await driver.get(url);
-    await driver.sleep(3000);
-    // const script = await fs.promises.readFile('help.js', 'utf-8');
-    await driver.executeScript(helpScript);
-    await driver.sleep(100000);
-    const element = driver.findElement(By.css('.post-storage'));
-    console.log(await element.getText());
-    // console.log(JSON.stringify(element));
-  } finally {
-    await driver.quit();
-  }
+const hashCode = function(s: string): number {
+  return s.split("").reduce(function(a, b) {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
 }
 
-parsePosts(baseUrl);
+function start_handler(post: string) {
+  console.log('-------------------');
+  console.log(post);
+  console.log('-------------------');
+}
+
+const chromeOptions = new chrome.Options()
+  .windowSize({width: 1920, height: 1080})
+  .addArguments('--headless');
+
+const driver = new Builder()
+  .forBrowser('chrome')
+  .setChromeOptions(chromeOptions)
+  .build();
+
+const oldPostsHash = new Set<number>()
+
+const parsePosts = async (url: string, new_post_handler: any) => {
+  await driver.get(url);
+  await driver.sleep(3000);
+
+  await driver.executeScript(helpScript);
+  await driver.sleep(20000);
+  const elements= await driver.findElements(By.css('.post'));
+
+  for (const element of elements) {
+    const text = await element.getText();
+    const hash = hashCode(text);
+    if (!oldPostsHash.has(hash)) {
+      new_post_handler(text);
+      oldPostsHash.add(hash);
+    }
+  }
+
+}
+
+const urls = ['https://www.facebook.com/groups/278895689675846/', 'https://www.facebook.com/groups/504173917225379']
+
+for (const url of urls) {
+  parsePosts(url, start_handler);
+  setInterval(async () => await parsePosts(url, start_handler), 300000);
+}
