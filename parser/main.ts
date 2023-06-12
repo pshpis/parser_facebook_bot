@@ -1,5 +1,6 @@
 import {Builder, By} from 'selenium-webdriver';
 import * as chrome from "selenium-webdriver/chrome";
+import * as fs from "fs";
 
 const helpScript =
   `
@@ -90,18 +91,27 @@ const chromeOptions = new chrome.Options()
 
 const driver = new Builder()
   .forBrowser('chrome')
+  .usingServer('http://78.40.219.74:4444/')
   .setChromeOptions(chromeOptions)
   .build();
 
 const oldPostsHash = new Set<number>()
 
-const parsePosts = async (url: string, new_post_handler: any) => {
+const parsePosts = async (url: string, new_post_handler: (text: string) => void) => {
+  console.log('Starting to parse posts...');
   await driver.get(url);
   await driver.sleep(3000);
 
+  console.log('Getting posts...');
   await driver.executeScript(helpScript);
   await driver.sleep(20000);
   const elements= await driver.findElements(By.css('.post'));
+
+  const page = await driver.getPageSource();
+  // console.log(page);
+  await fs.promises.writeFile('fb.html', page, 'utf8');
+
+  console.log(elements)
 
   for (const element of elements) {
     const text = await element.getText();
@@ -112,6 +122,8 @@ const parsePosts = async (url: string, new_post_handler: any) => {
     }
   }
 
+  console.log('Finished to parse posts');
+
 }
 
 const urls = ['https://www.facebook.com/groups/278895689675846/', 'https://www.facebook.com/groups/504173917225379']
@@ -120,3 +132,6 @@ for (const url of urls) {
   parsePosts(url, start_handler);
   setInterval(async () => await parsePosts(url, start_handler), 300000);
 }
+
+process.once('SIGINT', () => driver.quit());
+process.once('SIGTERM', () => driver.quit());

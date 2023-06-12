@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/selenium-webdriver": "^4.1.15",
-    "selenium-webdriver": "^4.9.2",
+    "selenium-webdriver": "^4.10.0",
     "telegraf": "^4.12.2"
   }
 }
