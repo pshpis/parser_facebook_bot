@@ -72,6 +72,11 @@ async function main() {
 main();
 `;
 
+const loginScript = `
+  document.querySelector('input[name="email"]').value='ebanyjkonc@gmail.com';
+  document.querySelector('input[name="pass"]').value='Oppayuppa0';
+  document.querySelector('button[name="login"]').click();
+`;
 
 type NewPostHandler = (newPost: string) => void;
 
@@ -90,11 +95,13 @@ export class FacebookParser {
   private oldPostsHash: Set<number>;
   private newPostHandler: NewPostHandler;
   private endlessParsingTimeout: number;
+  private loggedIn: boolean;
+  private loginStarted: boolean;
 
   constructor(config: IFacebookParserConfig) {
     this.chromeOptions = new chrome.Options()
-      .windowSize({width: 1920, height: 1080});
-    // .addArguments('--headless');
+      .windowSize({width: 1920, height: 1080})
+      .addArguments('--headless');
 
     this.driver = new Builder()
       .forBrowser('chrome')
@@ -107,6 +114,9 @@ export class FacebookParser {
     this.endlessParsingTimeout = config.endlessParsingTimeout;
 
     allParsers.push(this);
+
+    this.loggedIn = true;
+    this.loginStarted = false;
   }
 
   private getPostHashCode(s: string) {
@@ -125,6 +135,27 @@ export class FacebookParser {
     const page = await this.driver.getPageSource();
     await fs.promises.writeFile(filename, page, 'utf8');
   }
+  
+  
+  private async login(){
+    if (this.loggedIn || this.loginStarted){
+      return;
+    }
+    this.loginStarted = true;
+
+    console.log('login starting');
+
+    await this.openUrl('https://www.facebook.com/login');
+    console.log('has opened');
+
+    await this.saveHtml("fb_login.html");
+    await this.driver.executeScript(loginScript);
+    await this.driver.sleep(10000);
+    console.log("logining finished");
+    this.loginStarted = false;
+    this.loggedIn = true;
+  }
+
   public async parsePosts(url: string){
     console.log('Starting to parse posts...');
 
@@ -139,7 +170,13 @@ export class FacebookParser {
     await this.saveHtml('fb.html')
 
     console.log(elements)
-
+    
+    if (elements.length === 0) {
+      this.loggedIn = false;
+      await this.login();
+      this.parsePosts(url);
+      return;
+    }
     for (const element of elements) {
       const text = await element.getText();
       const hash = this.getPostHashCode(text);
@@ -158,8 +195,10 @@ export class FacebookParser {
 
   public async startEndlessParser(urls: Array<string>) {
     for (const url of urls) {
-      this.parsePosts(url);
-      setInterval(async () => this.parsePosts(url), this.endlessParsingTimeout);
+      await this.parsePosts(url);
+    }
+    for (const url of urls) {
+      setInterval(async () => this.parsePosts(url));
     }
   }
 }
