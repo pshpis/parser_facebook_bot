@@ -1,4 +1,4 @@
 # Project exclude paths
 /node_modules
-/parser/main.js
+/parser/index.js
 /tg_bot/*.js
