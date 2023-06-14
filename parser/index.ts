@@ -105,7 +105,7 @@ export class FacebookParser {
 
     this.driver = new Builder()
       .forBrowser('chrome')
-      .usingServer('http://78.40.219.74:4444/')
+      .usingServer('http://109.172.80.51:4444/')
       .setChromeOptions(this.chromeOptions)
       .build();
 
