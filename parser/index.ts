@@ -115,7 +115,7 @@ export class FacebookParser {
 
     allParsers.push(this);
 
-    this.loggedIn = true;
+    this.loggedIn = false;
     this.loginStarted = false;
   }
 
@@ -129,6 +129,15 @@ export class FacebookParser {
   private async openUrl(url: string) {
     await this.driver.get(url);
     await this.driver.sleep(3000);
+    console.log('take screenshot: ' + url);
+    await this.takeScreenshot(this.getPostHashCode(url).toString());
+  }
+
+  private async takeScreenshot(prefix: string) {
+    const img = await this.driver.takeScreenshot();
+    console.log('taking screenshot: ' + prefix);
+    
+    await fs.promises.writeFile(prefix + '_screenshot.png', img, 'base64');
   }
 
   private async saveHtml(filename: string) {
@@ -177,7 +186,7 @@ export class FacebookParser {
     console.log(elements)
     
     if (elements.length === 0) {
-      this.loggedIn = false;
+      
       await this.login();
       await this.parsePosts(url);
       return;
