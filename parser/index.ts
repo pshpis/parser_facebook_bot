@@ -141,19 +141,24 @@ export class FacebookParser {
     if (this.loggedIn || this.loginStarted){
       return;
     }
-    this.loginStarted = true;
+    try {
+      this.loginStarted = true;
 
-    console.log('login starting');
+      console.log('login starting');
 
-    await this.openUrl('https://www.facebook.com/login');
-    console.log('has opened');
+      await this.openUrl('https://www.facebook.com/login');
+      console.log('has opened');
 
-    await this.saveHtml("fb_login.html");
-    await this.driver.executeScript(loginScript);
-    await this.driver.sleep(10000);
-    console.log("logining finished");
-    this.loginStarted = false;
-    this.loggedIn = true;
+      await this.saveHtml("fb_login.html");
+      await this.driver.executeScript(loginScript);
+      await this.driver.sleep(10000);
+      console.log("logining finished");
+      this.loginStarted = false;
+      this.loggedIn = true;
+    }
+    catch (e) {
+      console.log(e);
+    }
   }
 
   public async parsePosts(url: string){
@@ -174,7 +179,7 @@ export class FacebookParser {
     if (elements.length === 0) {
       this.loggedIn = false;
       await this.login();
-      this.parsePosts(url);
+      await this.parsePosts(url);
       return;
     }
     for (const element of elements) {
