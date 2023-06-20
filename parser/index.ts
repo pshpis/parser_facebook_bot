@@ -102,8 +102,7 @@ export class FacebookParser {
   constructor(config: IFacebookParserConfig) {
     this.chromeOptions = new chrome.Options()
       .windowSize({width: 1920, height: 1080})
-      .addArguments('--headless')
-    ;
+      .addArguments('--headless');
 
     this.chromeOptions.addArguments('--proxy-server=103.156.248.102:8080');
 
