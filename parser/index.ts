@@ -66,6 +66,7 @@ async function main() {
 
         postStorage.appendChild(post);
     }
+    
     document.body.appendChild(postStorage);
 }
 
@@ -101,13 +102,19 @@ export class FacebookParser {
   constructor(config: IFacebookParserConfig) {
     this.chromeOptions = new chrome.Options()
       .windowSize({width: 1920, height: 1080})
-      .addArguments('--headless');
+      .addArguments('--headless')
+    ;
+
+    this.chromeOptions.addArguments('--proxy-server=103.156.248.102:8080');
+
 
     this.driver = new Builder()
       .forBrowser('chrome')
       .usingServer('http://109.172.80.51:4444/')
       .setChromeOptions(this.chromeOptions)
       .build();
+
+
 
     this.oldPostsHash = new Set<number>()
     this.newPostHandler = config.newPostHandler;
@@ -128,7 +135,7 @@ export class FacebookParser {
 
   private async openUrl(url: string) {
     await this.driver.get(url);
-    await this.driver.sleep(3000);
+    await this.driver.sleep(10000);
     console.log('take screenshot: ' + url);
     await this.takeScreenshot(this.getPostHashCode(url).toString());
   }
